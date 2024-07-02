@@ -5,6 +5,8 @@ import { Error } from "./middlewares/Error.js";
 import cookieParser from "cookie-parser";
 import userRoutes from "./routes/userRoutes.js";
 import chatRouter from "./routes/chatRoutes.js";
+import morgan from "morgan";
+import cors from 'cors'
 
 dotenv.config({
     path: './.env'
@@ -12,15 +14,23 @@ dotenv.config({
 const app = express();
 connectDb()
 
-//middlewares 
+const options = {
+    origin:['http://localhost:5173',process.env.CLIENT_URL],
+    credentials:true
+}
 
+//middlewares 
 app.use(express.json()); 
 app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
+app.use(morgan('tiny'))
+app.use(cors(options))
 
 //user routes
-app.use('/user' , userRoutes);
-app.use('/chat' , chatRouter);
+app.use('/api/v1/user' , userRoutes);
+
+//chat routes
+app.use('/api/v1/chat' , chatRouter);
 
 app.get('/', (req, res) => {
     res.send('Home page');

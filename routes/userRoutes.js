@@ -1,8 +1,9 @@
 import { Router } from "express";
 import { uploadAvatar } from "../middlewares/multer.js";
-import { createUser, loginUser, logoutUser, myData, searchUser, sendFriendRequest } from "../controllers/user.js";
+import { acceptFriendRequest, createUser, getNotifications, loginUser, logoutUser, myData, searchUser, sendFriendRequest } from "../controllers/user.js";
 import { isAuthenticated } from "../middlewares/IsAuthenticated.js";
-import { LoginValidator, RegisterValidator, sendRequestValidator, validationHandler } from "../middlewares/Validator.js";
+import { LoginValidator, RegisterValidator, acceptRequestValidator, sendRequestValidator, validationHandler } from "../middlewares/Validator.js";
+import { ErrorHandler } from "../utils/ErrorHandler.js";
 
 const app = Router();
 
@@ -28,8 +29,16 @@ app.get('/me' , myData);
 //search user in the search box
 app.get('/search',searchUser)
 
+app.get('/notification' , getNotifications)
+
 //send friend request
 app.post('/sendrequest' , sendRequestValidator() , validationHandler,sendFriendRequest)
 
+app.put('/acceptrequest' , acceptRequestValidator() , validationHandler, acceptFriendRequest)
+
+
+app.use('*' , (req,res,next) => {
+    return next(new ErrorHandler('Page not Found' , 404));
+})
 
 export default app;

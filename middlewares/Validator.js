@@ -49,6 +49,10 @@ const renameValidation = () => [
     body('name','please provide a name to rename the group').notEmpty()
 ]
 
+const acceptRequestValidator = () => [
+    body('reqId' , 'Please provide a valid ID').notEmpty(),
+    body('accept' , 'Please provide accept').notEmpty().isBoolean().withMessage('accept should be a boolean')
+]
 const validationHandler = (req, res, next) => {
   const { errors } = validationResult(req);
   const ErrorMessages = errors.map((er) => er.msg).join(",");
@@ -56,6 +60,7 @@ const validationHandler = (req, res, next) => {
   if (errors.length <= 0) return next();
   else return next(new ErrorHandler(ErrorMessages, 400));
 };
+
 
 export {
   RegisterValidator,
@@ -66,5 +71,6 @@ export {
   AddtoGroupValidation,
   RemoveFromGroupValidation,
   ChatIdValidation,
-  renameValidation
+  renameValidation,
+  acceptRequestValidator
 };
