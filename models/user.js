@@ -1,5 +1,5 @@
 import { compare, hash } from "bcrypt";
-import mongoose, {Schema,model, mongo} from "mongoose";
+import mongoose, {Schema,model} from "mongoose";
 
 const userSchema = new Schema({
     name: {
@@ -35,7 +35,6 @@ userSchema.pre('save', async function(next){
     if(!this.isModified('password')) {
         next();
     }
-
     this.password = await hash(this.password, 10);
     next();
 })
