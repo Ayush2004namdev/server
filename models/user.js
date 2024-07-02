@@ -1,4 +1,5 @@
-import { compare,hashSync} from "bcryptjs";
+import bcrypt from "bcryptjs";
+const { compare,hashSync} = bcrypt;
 import mongoose, {Schema,model} from "mongoose";
 
 const userSchema = new Schema({
