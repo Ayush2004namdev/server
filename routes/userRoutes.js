@@ -12,7 +12,7 @@ app.get("/", (req, res) => {
 });
 
 //create a new user
-app.post('/create', uploadAvatar , RegisterValidator(),validationHandler, createUser);
+app.post('/create', uploadAvatar, RegisterValidator(),validationHandler, createUser);
 
 //login route for an existing user
 app.post('/login' ,LoginValidator() , validationHandler, loginUser);

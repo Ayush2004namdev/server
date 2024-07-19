@@ -1,4 +1,5 @@
 import { NEW_REQUEST, REFETCH_CHATS } from "../lib/Constant.js";
+import uploadToClodinary from "../lib/clodinary.js";
 import { cookieOptions, emmit, sendCookie } from "../lib/features.js";
 import { Chat } from "../models/chat.js";
 import { Request } from "../models/request.js";
@@ -8,12 +9,17 @@ import { TryCatch } from "../utils/TryCatch.js";
 
 const createUser = TryCatch(async (req, res) => {
     const {name , username , password,bio} = req.body;
-    console.log(req.body);
     // save to cloudinary
+    console.log('file',req.file);
+
+    const result =await uploadToClodinary([req.file]);
+    
+    // console.log(req.file)
     const avatar = {
-        public_id : 'ausijd',
-        url : 'kdjf'
+        public_id:result[0]?.public_id, 
+        url:result[0]?.url
     }
+    console.log(avatar);
     const user = await User.create({
         name,
         username,
@@ -21,6 +27,7 @@ const createUser = TryCatch(async (req, res) => {
         bio,
         avatar
     });
+    console.count(req.file)
     const secret = process.env.JWT_SECRET;
     sendCookie(user , res, 201 , secret)
 })
@@ -59,19 +66,24 @@ const myData = TryCatch(async(req,res,next) => {
 const searchUser = TryCatch(async (req,res,next) => {
     const {name=''} = req.query;
     const myChats = await Chat.find({members:req.user , groupChat:false});
+    console.log(myChats);
     const allUsersInMyChats = myChats.flatMap(chat => chat.members);
-    const allUsersExceptMyFriens = await Chat.find({
-        _id:{$nin:allUsersInMyChats},
-        name:{$regex:name , $options:'i'}
+    console.log(allUsersInMyChats);
+    const allUsersExceptMyFriens = await User.find({
+        $and:[
+            {name:{$regex:name,$options:'i'}},
+            {_id:{$nin:allUsersInMyChats}}
+        ]
     })
+    console.log(allUsersExceptMyFriens);
 
     const transformedData = allUsersExceptMyFriens.map(({_id,name,avatar}) => ({
-        _id,name,avatar:avatar.url
+        _id,name,avatar:avatar
     }))
 
     res.status(200).json({
         success:true,
-        transformedData
+        data:transformedData
     })
 
 })

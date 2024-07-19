@@ -15,7 +15,7 @@ const createGroup = TryCatch(async (req, res, next) => {
   const { name, members } = req.body;
   if (!members || members.length < 3)
     return next(
-      new ErrorHandler("A Group must contain atleast 3 members", 304)
+      new ErrorHandler("A Group must contain atleast 3 members", 400)
     );
   const newChat = await Chat.create({
     name,
