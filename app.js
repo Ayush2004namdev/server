@@ -13,13 +13,21 @@ import {createServer} from 'http'
 import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from "./lib/Constant.js";
 import {v4 as uuid} from 'uuid'
 import { getSockets } from "./lib/features.js";
+import { socketAuthentication } from "./middlewares/IsAuthenticated.js";
+import { Message } from "./models/messages.js";
 
 dotenv.config({
     path: './.env'
 });
+const options = {
+    origin:['http://localhost:5173',process.env.CLIENT_URL],
+    credentials:true
+}
 const app = express();
 const server = createServer(app)
-const io = new Server(server,{});
+const io = new Server(server,{cors:options});
+app.set('io' , io);
+
 connectDb()
 const userSocketIds = new Map();
 
@@ -29,10 +37,6 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_SECRET 
 });
 
-const options = {
-    origin:['http://localhost:5173',process.env.CLIENT_URL],
-    credentials:true
-}
 
 //middlewares 
 app.use(express.json()); 
@@ -55,15 +59,17 @@ app.use('*', (req, res) => {
     res.status(404).send('Page not found');
 });
 
+io.use((socket,next) => {
+    
+    cookieParser()(socket.request,socket.request.res,async(err) => {
+        await socketAuthentication(err,socket,next);
+    });
+});
 
 io.on('connection', (socket) => {
-    console.log('user connected',socket.id);
-    const user = {
-        _id:'hfakjdf',
-        name:'abra ka dabra'
-    }
-    userSocketIds.set(user._id,socket.id);
-    socket.on(NEW_MESSAGE , ({chatId , message , members}) => {
+    const user = socket.user;
+    userSocketIds.set(user._id.toString(),socket.id.toString());
+    socket.on(NEW_MESSAGE ,async ({chatId , message , members=[]}) => {
         const messageForRealTime = {
             content:message,
             _id:uuid(),
@@ -84,9 +90,8 @@ io.on('connection', (socket) => {
         io.to(userSockets).emit(NEW_MESSAGE , {message:messageForRealTime , chatId});
         io.to(userSockets).emit(NEW_MESSAGE_ALERT, {chatId});
         
-        console.log('userSockets',userSockets);
-
-        console.log('message',messageForRealTime);
+        await Message.create(messageForDB); 
+        
     })
 
     socket.on('disconnect', () => {

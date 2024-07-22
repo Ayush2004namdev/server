@@ -40,10 +40,6 @@ const RemoveFromGroupValidation = () => [
     body('userId' , 'Please Provide UserId').notEmpty()
 ]
 
-const ChatIdValidation = () => [
-    query('id', 'Please provide with an Id').notEmpty()
-]
-
 const renameValidation = () => [
     query('id', 'Please provide with an Id').notEmpty(),
     body('name','please provide a name to rename the group').notEmpty()
@@ -70,7 +66,6 @@ export {
   sendRequestValidator,
   AddtoGroupValidation,
   RemoveFromGroupValidation,
-  ChatIdValidation,
   renameValidation,
   acceptRequestValidator
 };

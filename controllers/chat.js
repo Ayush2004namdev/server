@@ -1,6 +1,7 @@
 import {
   ALERT,
   NEW_ATTACHMENTS,
+  NEW_MESSAGE,
   NEW_MESSAGE_ALERT,
   REFETCH_CHATS,
 } from "../lib/Constant.js";
@@ -10,6 +11,7 @@ import { TryCatch } from "../utils/TryCatch.js";
 import { ErrorHandler } from "../utils/ErrorHandler.js";
 import { User } from "../models/user.js";
 import { Message } from "../models/messages.js";
+import uploadToClodinary from "../lib/clodinary.js";
 
 const createGroup = TryCatch(async (req, res, next) => {
   const { name, members } = req.body;
@@ -182,7 +184,7 @@ const sendAttachment = TryCatch(async (req, res, next) => {
     return next(new ErrorHandler("please provide Attachments", 400));
 
   //add to cloudinary
-  const attachments = []; // save data in this array
+  const attachments = await uploadToClodinary(files) // save data in this array
 
   const messageForRealTime = {
     content: "",
@@ -202,7 +204,7 @@ const sendAttachment = TryCatch(async (req, res, next) => {
 
   const message = await Message.create(messageForDB);
 
-  emmit(req, NEW_ATTACHMENTS, chat.members, {
+  emmit(req, NEW_MESSAGE, chat.members, {
     message: messageForRealTime,
     chatId,
   });
@@ -299,8 +301,8 @@ const getChatMessages = TryCatch(async(req,res,next) => {
     .lean()
     .limit(20)
     .skip((page-1) * limit)
-
-    const length = chat.length;
+    const allChats = await Message.countDocuments({chat:chatId});
+    const length = allChats.length;
     const pages = Math.ceil(length/limit);
 
     res.status(200).json({
