@@ -7,11 +7,11 @@ import { User } from "../models/user.js";
 import { ErrorHandler } from "../utils/ErrorHandler.js";
 import { TryCatch } from "../utils/TryCatch.js";
 
-const createUser = TryCatch(async (req, res) => {
+const createUser = TryCatch(async (req, res,next) => {
     const {name , username , password,bio} = req.body;
     // save to cloudinary
     console.log('file',req.file);
-
+    if(!file) return next(new ErrorHandler('please provide a profile image' , 400))
     const result =await uploadToClodinary([req.file]);
     
     // console.log(req.file)
