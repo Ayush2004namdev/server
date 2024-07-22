@@ -37,6 +37,7 @@ const loginUser = TryCatch(async(req,res,next) => {
     const {username , password} = req.body;
     console.log(username,password)
     const user = await User.findOne({username}).select('+password');
+    console.log(user)
     if(!user) return next(new ErrorHandler('Invalid Credentials' , 401));
     let isMatch = await user.comparePassword(password);
     if(!isMatch) return next(new ErrorHandler('Invalid Credentials' , 401));
@@ -66,7 +67,6 @@ const myData = TryCatch(async(req,res,next) => {
 const searchUser = TryCatch(async (req,res,next) => {
     const {name=''} = req.query;
     const myChats = await Chat.find({members:req.user , groupChat:false});
-    console.log(myChats);
     const allUsersInMyChats = myChats.flatMap(chat => chat.members);
     console.log(allUsersInMyChats);
     const allUsersExceptMyFriens = await User.find({
