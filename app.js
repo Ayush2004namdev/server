@@ -10,7 +10,7 @@ import cors from 'cors'
 import {v2 as cloudinary} from 'cloudinary'
 import {Server} from 'socket.io'
 import {createServer} from 'http'
-import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from "./lib/Constant.js";
+import { NEW_MESSAGE, NEW_MESSAGE_ALERT, TYPING_END, TYPING_START } from "./lib/Constant.js";
 import {v4 as uuid} from 'uuid'
 import { getSockets } from "./lib/features.js";
 import { socketAuthentication } from "./middlewares/IsAuthenticated.js";
@@ -92,6 +92,17 @@ io.on('connection', (socket) => {
         
         await Message.create(messageForDB); 
         
+    })
+
+    socket.on(TYPING_START , ({chatId , members=[]}) => {
+        const userSocket = getSockets(members);
+        console.log(user);
+        io.to(userSocket).emit(TYPING_START , {chatId,user:user._id});
+    })
+
+    socket.on(TYPING_END , ({chatId , members=[]}) => {
+        const userSocket = getSockets(members);
+        io.to(userSocket).emit(TYPING_END , {chatId , user:user._id});
     })
 
     socket.on('disconnect', () => {

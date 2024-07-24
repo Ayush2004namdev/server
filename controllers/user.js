@@ -72,7 +72,7 @@ const searchUser = TryCatch(async (req,res,next) => {
     const allUsersExceptMyFriens = await User.find({
         $and:[
             {name:{$regex:name,$options:'i'}},
-            {_id:{$nin:allUsersInMyChats}}
+            {_id:{$nin:allUsersInMyChats , $nin:req.user}}
         ]
     })
     console.log(allUsersExceptMyFriens);

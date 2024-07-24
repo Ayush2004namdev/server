@@ -37,6 +37,7 @@ app.post('/sendrequest' , sendRequestValidator() , validationHandler,sendFriendR
 app.put('/acceptrequest' , acceptRequestValidator() , validationHandler, acceptFriendRequest)
 
 
+
 app.use('*' , (req,res,next) => {
     return next(new ErrorHandler('Page not Found' , 404));
 })
