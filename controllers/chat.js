@@ -31,7 +31,8 @@ const createGroup = TryCatch(async (req, res, next) => {
   emmit(res, REFETCH_CHATS, members);
   res.status(200).json({
     success: true,
-    message: newChat,
+    message: 'Group Created Successfully',
+    newChat,
   });
 });
 
@@ -143,7 +144,7 @@ const removeFromGroup = TryCatch(async (req, res, next) => {
     group.members,
     `${user.name} has been removed from the group`
   );
-  emmit(req.REFETCH_CHATS, group.members);
+  emmit(req,REFETCH_CHATS, group.members);
 
   res.status(200).json({
     success: true,

@@ -1,4 +1,4 @@
-import { body, query, validationResult } from "express-validator";
+import { body, param, query, validationResult } from "express-validator";
 import { ErrorHandler } from "../utils/ErrorHandler.js";
 
 const RegisterValidator = () => [
@@ -41,7 +41,7 @@ const RemoveFromGroupValidation = () => [
 ]
 
 const renameValidation = () => [
-    query('id', 'Please provide with an Id').notEmpty(),
+    param('id', 'Please provide with an Id').notEmpty(),
     body('name','please provide a name to rename the group').notEmpty()
 ]
 

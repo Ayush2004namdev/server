@@ -1,6 +1,6 @@
 import { NEW_REQUEST, REFETCH_CHATS } from "../lib/Constant.js";
 import uploadToClodinary from "../lib/clodinary.js";
-import { cookieOptions, emmit, sendCookie } from "../lib/features.js";
+import { cookieOptions, emmit, getOtherUser, sendCookie } from "../lib/features.js";
 import { Chat } from "../models/chat.js";
 import { Request } from "../models/request.js";
 import { User } from "../models/user.js";
@@ -151,6 +151,19 @@ const getNotifications = TryCatch(async(req,res,next) => {
     })
 })
 
+const getMyFriends = TryCatch(async(req,res,next) => {
+    const myChats = await Chat.find({members:req.user , groupChat:false}).populate('members' , 'name avatar');
+    const fr = myChats.flatMap(chat => chat.members);
+    const friends = getOtherUser(fr,req.user);
+    if(!friends) return next(new ErrorHandler('No Friends Found' , 404));
+    const transformedData = friends.map(({_id,name,avatar}) => ({
+        _id,name,avatar:avatar?.url
+    }))
+    res.status(200).json({
+        success:true,
+        friends:transformedData
+    })
+})
 
-export { createUser, loginUser, logoutUser, myData, searchUser, sendFriendRequest , acceptFriendRequest,getNotifications};
+export { createUser, loginUser, logoutUser, myData, searchUser, sendFriendRequest , acceptFriendRequest,getNotifications,getMyFriends};
 

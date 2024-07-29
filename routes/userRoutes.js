@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { uploadAvatar } from "../middlewares/multer.js";
-import { acceptFriendRequest, createUser, getNotifications, loginUser, logoutUser, myData, searchUser, sendFriendRequest } from "../controllers/user.js";
+import { acceptFriendRequest, createUser, getMyFriends, getNotifications, loginUser, logoutUser, myData, searchUser, sendFriendRequest } from "../controllers/user.js";
 import { isAuthenticated } from "../middlewares/IsAuthenticated.js";
 import { LoginValidator, RegisterValidator, acceptRequestValidator, sendRequestValidator, validationHandler } from "../middlewares/Validator.js";
 import { ErrorHandler } from "../utils/ErrorHandler.js";
@@ -36,6 +36,7 @@ app.post('/sendrequest' , sendRequestValidator() , validationHandler,sendFriendR
 
 app.put('/acceptrequest' , acceptRequestValidator() , validationHandler, acceptFriendRequest)
 
+app.get('/friends' , getMyFriends)
 
 
 app.use('*' , (req,res,next) => {
